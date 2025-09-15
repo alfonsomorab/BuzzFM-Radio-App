@@ -1,0 +1,19 @@
+# Infrastructure & Deployment
+
+This directory will contain deployment configurations and infrastructure-as-code for the radio streaming platform.
+
+## Coming Soon
+- Docker configurations for containerized deployment
+- Kubernetes manifests for scalable deployment
+- CI/CD pipeline configurations
+- Cloud provider specific configs (AWS, GCP, Azure)
+- Load balancer and CDN configurations
+- Database migration and backup scripts
+
+## Planned Features
+- **Docker Compose** for local development
+- **Kubernetes** for production scaling
+- **GitHub Actions** for CI/CD
+- **Terraform** for infrastructure provisioning
+- **Monitoring** with Prometheus and Grafana
+- **SSL** certificate automation

@@ -1,0 +1,20 @@
+# React.js Admin Dashboard
+
+This directory will contain the React.js frontend dashboard for managing the radio streaming platform.
+
+## Coming Soon
+- Real-time analytics dashboard
+- Program schedule management interface
+- Stream configuration panel
+- User management system
+- Push notification composer
+- Content library management
+
+## Planned Technology Stack
+- React 18+
+- TypeScript
+- Vite
+- TanStack Query
+- Zustand for state management
+- Mantine or Ant Design for UI components
+- Chart.js for data visualization
