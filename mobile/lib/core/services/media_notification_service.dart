@@ -106,8 +106,8 @@ class MediaNotificationService extends BaseAudioHandler with SeekHandler {
         id: 'radio_stream',
         title: 'Radio Stream',
         artist: 'Live Radio',
-        duration: null, // Live stream
-        artUri: null,
+        duration: null, // Live stream - no progress bar
+        artUri: null, // No album art placeholder
         extras: {'isLive': true},
       ));
       return;
@@ -120,7 +120,7 @@ class MediaNotificationService extends BaseAudioHandler with SeekHandler {
       title: program.title,
       artist: program.host ?? 'Live Radio',
       album: 'Radio Program',
-      duration: null, // Live stream
+      duration: null, // Live stream - no progress bar
       artUri: Uri.tryParse(program.imageUrl),
       extras: {
         'isLive': true,
