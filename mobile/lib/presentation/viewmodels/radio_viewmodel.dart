@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/services/media_notification_service.dart';
 import '../../domain/entities/radio_program.dart';
 import '../../domain/entities/stream_info.dart';
 import '../../domain/usecases/get_current_program.dart';
@@ -9,11 +10,13 @@ class RadioViewModel extends ChangeNotifier {
   final GetCurrentProgram getCurrentProgram;
   final GetStreamUrls getStreamUrls;
   final AudioPlayerService audioPlayerService;
+  final MediaNotificationService mediaNotificationService;
 
   RadioViewModel({
     required this.getCurrentProgram,
     required this.getStreamUrls,
     required this.audioPlayerService,
+    required this.mediaNotificationService,
   }) {
     _init();
   }
@@ -64,6 +67,8 @@ class RadioViewModel extends ChangeNotifier {
     try {
       _currentProgram = await getCurrentProgram();
       _error = null;
+      // Update media notification with current program info
+      await mediaNotificationService.updateCurrentProgram(_currentProgram);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -85,12 +90,13 @@ class RadioViewModel extends ChangeNotifier {
   Future<void> togglePlayback() async {
     try {
       if (_playbackState == PlaybackState.playing) {
-        await audioPlayerService.pause();
+        await mediaNotificationService.pause();
       } else {
         if (audioPlayerService.currentStreamUrl == null && _streamUrls.isNotEmpty) {
-          await audioPlayerService.setStreamUrl(_streamUrls.first.url);
+          await mediaNotificationService.setStreamUrl(_streamUrls.first.url);
+          await mediaNotificationService.updateStreamUrl(_streamUrls.first.url);
         }
-        await audioPlayerService.play();
+        await mediaNotificationService.play();
       }
     } catch (e) {
       _error = e.toString();
@@ -100,7 +106,7 @@ class RadioViewModel extends ChangeNotifier {
 
   Future<void> stop() async {
     try {
-      await audioPlayerService.stop();
+      await mediaNotificationService.stop();
     } catch (e) {
       _error = e.toString();
       notifyListeners();
@@ -109,11 +115,8 @@ class RadioViewModel extends ChangeNotifier {
 
   Future<void> changeStream(String streamUrl) async {
     try {
-      final wasPlaying = _playbackState == PlaybackState.playing;
-      await audioPlayerService.setStreamUrl(streamUrl);
-      if (wasPlaying) {
-        await audioPlayerService.play();
-      }
+      await mediaNotificationService.changeStreamQuality(streamUrl);
+      await mediaNotificationService.updateStreamUrl(streamUrl);
     } catch (e) {
       _error = e.toString();
       notifyListeners();

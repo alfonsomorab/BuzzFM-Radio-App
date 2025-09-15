@@ -6,7 +6,11 @@ import 'presentation/views/main_navigation.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EnvironmentConfig.initialize();
-  DependencyInjection().init();
+
+  final di = DependencyInjection();
+  di.init();
+  await di.initializeServices();
+
   runApp(const RadioApp());
 }
 

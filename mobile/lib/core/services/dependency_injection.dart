@@ -12,6 +12,7 @@ import '../../presentation/viewmodels/radio_viewmodel.dart';
 import '../../presentation/viewmodels/schedule_viewmodel.dart';
 import '../../presentation/viewmodels/settings_viewmodel.dart';
 import 'audio_service.dart';
+import 'media_notification_service.dart';
 
 class DependencyInjection {
   static final DependencyInjection _instance = DependencyInjection._internal();
@@ -24,6 +25,7 @@ class DependencyInjection {
   late final RadioRepository _radioRepository;
   late final SettingsRepository _settingsRepository;
   late final AudioPlayerService _audioPlayerService;
+  late final MediaNotificationService _mediaNotificationService;
 
   void init() {
     _radioRemoteDataSource = RadioRemoteDataSourceImpl();
@@ -40,12 +42,18 @@ class DependencyInjection {
     );
 
     _audioPlayerService = AudioPlayerService();
+    _mediaNotificationService = MediaNotificationService();
+  }
+
+  Future<void> initializeServices() async {
+    await _mediaNotificationService.initialize();
   }
 
   RadioViewModel get radioViewModel => RadioViewModel(
         getCurrentProgram: GetCurrentProgram(_radioRepository),
         getStreamUrls: GetStreamUrls(_radioRepository),
         audioPlayerService: _audioPlayerService,
+        mediaNotificationService: _mediaNotificationService,
       );
 
   ScheduleViewModel get scheduleViewModel => ScheduleViewModel(
@@ -60,4 +68,5 @@ class DependencyInjection {
       );
 
   AudioPlayerService get audioPlayerService => _audioPlayerService;
+  MediaNotificationService get mediaNotificationService => _mediaNotificationService;
 }
