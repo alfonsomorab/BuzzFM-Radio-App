@@ -11,23 +11,30 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts",
+    "db:seed-admin": "tsx src/db/seed-admin.ts",
     "docs:update": "cp openapi.yaml public/openapi.yaml",
     "docs:serve": "npm run dev"
   },
   "description": "Next.js backend for radio streaming management platform",
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^24.10.1",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.7",
     "drizzle-orm": "^0.44.7",
     "jose": "^5.10.0",
     "next": "^16.0.5",
+    "next-auth": "^5.0.0-beta.30",
+    "nodemailer": "^7.0.11",
     "pg": "^8.16.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/pg": "^8.15.6",

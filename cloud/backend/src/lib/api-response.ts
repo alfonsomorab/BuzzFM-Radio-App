@@ -72,4 +72,26 @@ export const ApiErrors = {
 
   invalidToken: (message: string = 'Invalid or malformed JWT token') =>
     errorResponse(message, 401, 'INVALID_TOKEN'),
+
+  // Admin-specific error responses
+  validationError: (details: any) =>
+    errorResponse('Validation failed', 400, 'VALIDATION_ERROR', details),
+
+  stationNotFound: () =>
+    errorResponse('Station not found', 404, 'STATION_NOT_FOUND'),
+
+  paymentNotFound: () =>
+    errorResponse('Payment not found', 404, 'PAYMENT_NOT_FOUND'),
+
+  emailSendFailed: (reason: string) =>
+    errorResponse(`Email sending failed: ${reason}`, 500, 'EMAIL_SEND_FAILED'),
+
+  duplicateApiKey: () =>
+    errorResponse('API key already exists', 409, 'DUPLICATE_API_KEY'),
+
+  duplicateSlug: () =>
+    errorResponse('Station slug already exists', 409, 'DUPLICATE_SLUG'),
+
+  cannotDeleteStation: (reason: string) =>
+    errorResponse(`Cannot delete station: ${reason}`, 400, 'CANNOT_DELETE_STATION'),
 };
