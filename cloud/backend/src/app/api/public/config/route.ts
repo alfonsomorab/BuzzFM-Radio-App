@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { validateApiKey, isStationActive } from '@/lib/auth';
+import { validateJwt, isStationActive } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/public/config
  *
  * Returns station configuration for mobile app
- * Requires: Authorization header with Bearer token (API key)
+ * Requires: Authorization header with Bearer token (JWT)
  *
  * Response includes:
  * - Station name and status
@@ -18,15 +18,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Validate API key
-    const { station, error } = await validateApiKey(request);
+    // Validate JWT token
+    const { station, error } = await validateJwt(request);
 
     if (error || !station) {
       return error;
     }
 
-    // Check rate limit
-    const rateLimit = checkRateLimit(station.apiKey, RateLimitPresets.publicApi);
+    // Check rate limit (use station ID for JWT-based auth)
+    const rateLimit = checkRateLimit(station.id, RateLimitPresets.publicApi);
     if (!rateLimit.allowed) {
       return ApiErrors.forbidden(
         `Rate limit exceeded. Try again in ${Math.ceil((rateLimit.resetTime - Date.now()) / 1000)} seconds`

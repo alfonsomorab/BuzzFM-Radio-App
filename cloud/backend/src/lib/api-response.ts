@@ -61,4 +61,15 @@ export const ApiErrors = {
 
   stationSuspended: () =>
     errorResponse('Station is suspended', 403, 'STATION_SUSPENDED'),
+
+  // JWT-specific error responses
+  tokenExpired: () =>
+    errorResponse(
+      'JWT token has expired. Please re-authenticate with your API key at /api/public/auth',
+      401,
+      'TOKEN_EXPIRED'
+    ),
+
+  invalidToken: (message: string = 'Invalid or malformed JWT token') =>
+    errorResponse(message, 401, 'INVALID_TOKEN'),
 };

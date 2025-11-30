@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { radioStations } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { ApiErrors } from './api-response';
+import { extractJwtToken, verifyJwt } from './jwt';
 
 export interface AuthenticatedStation {
   id: string;
@@ -80,4 +81,78 @@ export async function validateApiKey(
  */
 export function isStationActive(station: AuthenticatedStation): boolean {
   return station.status === 'active';
+}
+
+/**
+ * Validates JWT token from Authorization header
+ * Expected format: "Bearer {jwt_token}"
+ *
+ * This is the primary authentication method for protected endpoints.
+ * Mobile apps obtain JWT tokens by authenticating with their API key at /api/public/auth
+ */
+export async function validateJwt(
+  request: NextRequest
+): Promise<{ station: AuthenticatedStation | null; error: any | null }> {
+  try {
+    // Extract JWT token from Authorization header
+    const token = extractJwtToken(request);
+
+    if (!token) {
+      return {
+        station: null,
+        error: ApiErrors.invalidToken('Missing or invalid authorization header'),
+      };
+    }
+
+    // Verify and decode JWT
+    const verification = await verifyJwt(token);
+
+    if (!verification.valid) {
+      // Handle specific JWT errors
+      if (verification.error === 'TOKEN_EXPIRED') {
+        return {
+          station: null,
+          error: ApiErrors.tokenExpired(),
+        };
+      }
+
+      return {
+        station: null,
+        error: ApiErrors.invalidToken(),
+      };
+    }
+
+    // JWT is valid, fetch station data from database
+    // We still need to fetch full station data as JWT only contains minimal claims
+    const [station] = await db
+      .select({
+        id: radioStations.id,
+        name: radioStations.name,
+        slug: radioStations.slug,
+        status: radioStations.status,
+        apiKey: radioStations.apiKey,
+        streamUrlPrimary: radioStations.streamUrlPrimary,
+        streamUrlBackup: radioStations.streamUrlBackup,
+        branding: radioStations.branding,
+      })
+      .from(radioStations)
+      .where(eq(radioStations.id, verification.payload!.stationId))
+      .limit(1);
+
+    if (!station) {
+      // Station not found - token references non-existent station
+      return {
+        station: null,
+        error: ApiErrors.invalidToken('Station not found'),
+      };
+    }
+
+    return { station, error: null };
+  } catch (error) {
+    console.error('JWT validation error:', error);
+    return {
+      station: null,
+      error: ApiErrors.internalError('Authentication failed'),
+    };
+  }
 }

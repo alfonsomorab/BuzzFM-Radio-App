@@ -81,6 +81,12 @@ export function checkRateLimit(
  * Rate limit presets for different endpoint types
  */
 export const RateLimitPresets = {
+  // Authentication endpoint (very restrictive to prevent brute force)
+  auth: {
+    interval: 60 * 1000, // 1 minute
+    maxRequests: 10,
+  },
+
   // Public API endpoints (generous for mobile apps)
   publicApi: {
     interval: 60 * 1000, // 1 minute

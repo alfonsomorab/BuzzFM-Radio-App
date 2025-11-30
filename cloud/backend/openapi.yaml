@@ -3,9 +3,15 @@ info:
   title: Radio Streaming Management Platform API
   description: |
     REST API for radio streaming platform with three authentication layers:
-    - **Public Mobile API** - API key authentication for mobile apps
+    - **Public Mobile API** - JWT token authentication for mobile apps (obtained via API key)
     - **Admin API** - Session authentication for platform administrators
     - **Station API** - Session authentication for radio station managers
+
+    ## Mobile Authentication Flow
+    1. Mobile app calls `/api/public/auth` with API key → receives JWT token
+    2. JWT token is valid for 24 hours
+    3. All subsequent API calls use JWT in Authorization header
+    4. When JWT expires, re-authenticate with API key (no refresh tokens)
 
     Built with Next.js 14+, TypeScript, and PostgreSQL.
   version: 1.0.0
@@ -43,6 +49,75 @@ paths:
   # PUBLIC MOBILE API ENDPOINTS
   # ==========================================
 
+  /api/public/auth:
+    post:
+      tags:
+        - Public Mobile API
+      summary: Authenticate and obtain JWT token
+      description: |
+        Exchange API key for a JWT token that's valid for 24 hours.
+        Mobile apps should call this endpoint once to obtain a JWT, then use that token for all subsequent requests.
+        When the token expires, re-authenticate by calling this endpoint again.
+
+        **Rate Limit:** 10 requests per minute
+      operationId: authenticateStation
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Authentication successful, JWT token returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        description: JWT token to use in Authorization header
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      expiresAt:
+                        type: string
+                        format: date-time
+                        description: ISO 8601 timestamp when token expires
+                        example: "2024-11-30T19:45:00.000Z"
+                      expiresIn:
+                        type: integer
+                        description: Token lifetime in seconds
+                        example: 86400
+                      station:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                            example: "123e4567-e89b-12d3-a456-426614174000"
+                          name:
+                            type: string
+                            example: "Magic FM 95.7"
+                          slug:
+                            type: string
+                            example: "magic-fm"
+                          status:
+                            type: string
+                            enum: [active, suspended]
+                            example: "active"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
   /api/public/config:
     get:
       tags:
@@ -51,7 +126,7 @@ paths:
       description: Returns station details, stream URLs, status, and branding for the mobile app
       operationId: getStationConfig
       security:
-        - ApiKeyAuth: []
+        - JwtAuth: []
       responses:
         '200':
           description: Station configuration retrieved successfully
@@ -134,7 +209,7 @@ paths:
       description: Returns program schedule for a specific date
       operationId: getProgramSchedule
       security:
-        - ApiKeyAuth: []
+        - JwtAuth: []
       parameters:
         - name: date
           in: query
@@ -175,7 +250,7 @@ paths:
       description: Records analytics data from mobile app listening session
       operationId: logAnalytics
       security:
-        - ApiKeyAuth: []
+        - JwtAuth: []
       requestBody:
         required: true
         content:
@@ -850,7 +925,18 @@ components:
       type: http
       scheme: bearer
       bearerFormat: API Key
-      description: API key for mobile app authentication (format: Bearer sk_live_...)
+      description: |
+        API key for initial authentication (format: Bearer sk_live_...)
+        Used only for /api/public/auth endpoint to obtain JWT token.
+
+    JwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token for mobile API authentication (format: Bearer eyJhbGci...)
+        Obtained from /api/public/auth endpoint. Valid for 24 hours.
+        Used for all protected public API endpoints.
 
     SessionAuth:
       type: apiKey

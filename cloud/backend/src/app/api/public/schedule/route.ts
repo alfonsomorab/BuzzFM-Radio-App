@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { validateApiKey } from '@/lib/auth';
+import { validateJwt } from '@/lib/auth';
 import { successResponse, ApiErrors } from '@/lib/api-response';
 import { checkRateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import { db } from '@/db';
@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/public/schedule?date=YYYY-MM-DD
  *
  * Returns program schedule for a specific date or day of week
- * Requires: Authorization header with Bearer token (API key)
+ * Requires: Authorization header with Bearer token (JWT)
  *
  * Query params:
  * - date (optional): Date in YYYY-MM-DD format. If not provided, returns today's schedule
@@ -22,15 +22,15 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    // Validate API key
-    const { station, error } = await validateApiKey(request);
+    // Validate JWT token
+    const { station, error } = await validateJwt(request);
 
     if (error || !station) {
       return error;
     }
 
-    // Check rate limit
-    const rateLimit = checkRateLimit(station.apiKey, RateLimitPresets.publicApi);
+    // Check rate limit (use station ID for JWT-based auth)
+    const rateLimit = checkRateLimit(station.id, RateLimitPresets.publicApi);
     if (!rateLimit.allowed) {
       return ApiErrors.forbidden(
         `Rate limit exceeded. Try again in ${Math.ceil((rateLimit.resetTime - Date.now()) / 1000)} seconds`
