@@ -1,340 +1,202 @@
-# ☁️ Cloud Platform - Laravel + React.js
+# ☁️ Cloud Platform - Next.js Backend + Web Dashboards
 
-This directory will contain the web-based management platform for the radio streaming service, built with **Laravel** (backend API) and **React.js** (admin dashboard).
+This directory contains the Next.js backend and web-based management platform for the radio streaming service.
 
 ## 🎯 Overview
 
-The cloud platform will provide a comprehensive web-based management system for radio stations to manage their content, schedules, users, and mobile app configurations.
+The cloud platform provides a comprehensive web-based management system for radio stations, built as a single Next.js application with API routes and dashboard pages.
 
-## 📁 Planned Structure
+## 📁 Current Structure
 
 ```
 cloud/
-├── backend/                    # Laravel API Backend
-│   ├── app/
-│   │   ├── Http/Controllers/  # API controllers
-│   │   ├── Models/            # Eloquent models
-│   │   ├── Services/          # Business logic services
-│   │   └── Broadcasting/      # Real-time features
-│   ├── database/
-│   │   ├── migrations/        # Database schemas
-│   │   └── seeders/          # Sample data
-│   ├── routes/
-│   │   ├── api.php           # API routes
-│   │   └── web.php           # Web routes
-│   └── config/               # Configuration files
-│
-├── frontend/                   # React.js Admin Dashboard
-│   ├── src/
-│   │   ├── components/       # Reusable UI components
-│   │   ├── pages/           # Dashboard pages
-│   │   ├── services/        # API communication
-│   │   ├── hooks/           # Custom React hooks
-│   │   └── utils/           # Utility functions
-│   ├── public/              # Static assets
-│   └── package.json         # Dependencies
-│
-├── infrastructure/            # Deployment & DevOps
-│   ├── docker/              # Docker configurations
-│   ├── k8s/                 # Kubernetes manifests
-│   └── scripts/             # Deployment scripts
-│
-└── README.md                 # This file
+└── backend/                    # Next.js Full-Stack Application
+    ├── src/
+    │   ├── app/
+    │   │   ├── api/           # API routes (public, admin, station)
+    │   │   ├── admin/         # Admin dashboard pages
+    │   │   ├── station/       # Station user pages
+    │   │   ├── layout.tsx     # Root layout
+    │   │   └── page.tsx       # Home page
+    │   ├── components/        # React components
+    │   ├── db/               # Drizzle ORM schema & migrations
+    │   └── lib/              # Utilities, auth, email
+    ├── drizzle.config.ts
+    ├── package.json
+    └── README.md
+
 ```
 
-## 🚀 Planned Features
+## 🚀 Technology Stack
 
-### Backend API (Laravel)
+### Backend
+- **Next.js 14+** - Full-stack React framework with App Router
+- **TypeScript 5.0+** - Type-safe development
+- **PostgreSQL 15+** - Robust relational database
+- **Drizzle ORM** - Type-safe ORM for database operations
+- **NextAuth.js** - Authentication for web dashboards (Phase 3+)
+- **Nodemailer + SMTP** - Email notifications (Phase 3+)
 
-#### 🎵 **Stream Management**
-- Upload and manage audio files
-- Configure multiple quality streams
-- Real-time stream health monitoring
-- CDN integration for global delivery
-
-#### 📅 **Schedule Management**
-- Create and manage program schedules
-- Drag-and-drop schedule editor
-- Recurring program support
-- Automatic program transitions
-
-#### 👥 **User Management**
-- Multi-role authentication (Admin, Broadcaster, Editor)
-- User permissions and access control
-- API key management for mobile apps
-- Activity logging and audit trails
-
-#### 📊 **Analytics & Reporting**
-- Real-time listener statistics
-- Geographic listening data
-- Program performance metrics
-- Mobile app usage analytics
-
-#### 🔔 **Notification System**
-- Push notifications to mobile apps
-- Email notifications for users
-- Program reminder notifications
-- Emergency broadcast alerts
-
-#### 🎨 **Content Management**
-- Program metadata (titles, descriptions, images)
-- Host and broadcaster profiles
-- Show categories and tags
-- Featured content management
-
-#### 🔧 **App Configuration**
-- Mobile app settings management
-- Stream quality configuration
-- Feature toggles for mobile apps
-- Branding and theme settings
-
-### Frontend Dashboard (React.js)
-
-#### 📊 **Analytics Dashboard**
-```
-┌─────────────────────────────────────────────────────────┐
-│ 📊 Radio Station Dashboard                              │
-├─────────────────┬─────────────────┬─────────────────────┤
-│ 👥 Live Users   │ 🎵 Now Playing │ 📈 Today's Stats    │
-│ 1,234          │ Morning Show    │ ↗️ 15% vs yesterday │
-├─────────────────┼─────────────────┼─────────────────────┤
-│ 🌍 Geographic Distribution      │ 📱 Platform Split    │
-│ [Interactive World Map]         │ iOS: 60% Android: 40%│
-└─────────────────────────────────┴─────────────────────┘
-```
-
-#### 📅 **Schedule Manager**
-- Visual timeline editor
-- Drag-and-drop program scheduling
-- Bulk operations for recurring shows
-- Conflict detection and resolution
-- Calendar integration
-
-#### 🎵 **Content Library**
-- Audio file upload and management
-- Metadata editing interface
-- Preview and playback controls
-- File organization and tagging
-- Storage usage monitoring
-
-#### ⚙️ **Settings Panel**
-- Stream configuration
-- Mobile app settings
-- User role management
-- Notification preferences
-- Integration settings
-
-#### 📱 **Mobile App Control**
-- Push notification composer
-- App feature toggles
-- Version management
-- User feedback monitoring
-- Crash report analysis
-
-## 🛠️ Technology Stack
-
-### Backend (Laravel)
-- **PHP 8.1+** - Modern PHP features
-- **Laravel 10+** - Robust backend framework
-- **MySQL/PostgreSQL** - Primary database
-- **Redis** - Caching and session storage
-- **Laravel Sanctum** - API authentication
-- **Laravel Broadcasting** - Real-time features
-- **Laravel Horizon** - Queue monitoring
-- **Spatie Packages** - Permissions, media library
-
-### Frontend (React.js)
-- **React 18+** - Modern frontend library
-- **TypeScript** - Type safety
-- **Vite** - Fast build tool
-- **React Router** - Client-side routing
-- **TanStack Query** - Server state management
-- **Zustand** - Client state management
-- **Mantine/Ant Design** - UI component library
-- **Chart.js/Recharts** - Data visualization
+### Frontend (Web Dashboards)
+- **Next.js with React** - Server and client components
+- **Simple CSS & Bootstrap** - Responsive layouts and basic styling (NO Tailwind)
+- **React components** - Custom UI components for dashboards
 
 ### Infrastructure
-- **Docker** - Containerization
-- **nginx** - Web server and load balancer
-- **AWS S3** - File storage
-- **AWS CloudFront** - CDN for audio streaming
-- **Let's Encrypt** - SSL certificates
-- **GitHub Actions** - CI/CD pipeline
+- **Vercel** (recommended) or **Docker** - Deployment options
+- **PostgreSQL** - Database hosting (AWS RDS, Supabase, etc.)
 
-## 📋 API Endpoints (Planned)
+## 🚀 Getting Started
 
-### Authentication
-```http
-POST /api/auth/login
-POST /api/auth/logout
-POST /api/auth/refresh
-GET  /api/auth/user
-```
+See the detailed setup guide in [`backend/README.md`](./backend/README.md)
 
-### Streams
-```http
-GET    /api/streams              # List all streams
-POST   /api/streams              # Create new stream
-GET    /api/streams/{id}         # Get stream details
-PUT    /api/streams/{id}         # Update stream
-DELETE /api/streams/{id}         # Delete stream
-GET    /api/streams/{id}/status  # Stream health check
-```
-
-### Schedule
-```http
-GET    /api/schedule             # Get current schedule
-POST   /api/schedule             # Create program
-PUT    /api/schedule/{id}        # Update program
-DELETE /api/schedule/{id}        # Delete program
-GET    /api/schedule/now         # Current program
-GET    /api/schedule/next        # Next program
-```
-
-### Analytics
-```http
-GET /api/analytics/listeners     # Current listeners
-GET /api/analytics/geography     # Geographic data
-GET /api/analytics/programs      # Program statistics
-GET /api/analytics/devices       # Device/platform data
-```
-
-### Mobile App Management
-```http
-GET    /api/mobile/config        # App configuration
-PUT    /api/mobile/config        # Update app config
-POST   /api/mobile/notification  # Send push notification
-GET    /api/mobile/versions      # App version info
-```
-
-## 🚀 Getting Started (When Ready)
-
-### Prerequisites
-- PHP 8.1+
-- Composer
-- Node.js 18+
-- MySQL/PostgreSQL
-- Redis (optional but recommended)
-- Docker (for containerized setup)
-
-### Backend Setup
+**Quick Start:**
 ```bash
 cd cloud/backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate
-php artisan db:seed
-php artisan serve
-```
-
-### Frontend Setup
-```bash
-cd cloud/frontend
 npm install
+cp .env.example .env.local
+# Edit .env.local with your database credentials
+createdb radio_streaming
+npm run db:push
+npm run db:seed
 npm run dev
 ```
 
-### Docker Setup
+Access the development server at `http://localhost:3000`
+
+## 🎯 Features
+
+### Current Features (Phase 1 Complete) ✅
+- Complete database schema (6 tables)
+- Drizzle ORM setup with PostgreSQL
+- Database migrations and seeding
+- Sample data for development
+- API documentation with Swagger UI
+
+### Planned Features
+
+**Phase 2 - Public Mobile API:**
+- API key authentication middleware
+- Station configuration endpoint
+- Program schedule endpoint
+- Analytics logging endpoint
+- Rate limiting
+
+**Phase 3 - Admin Dashboard Backend:**
+- NextAuth.js authentication
+- Station CRUD operations
+- Payment tracking
+- Email service with subscription reminders
+- User management
+
+**Phase 4 - Admin Dashboard Frontend:**
+- Simple responsive UI with Bootstrap
+- Station management interface
+- API key management
+- Payment tracking interface
+- Email reminder controls
+
+**Phase 5-6 - Station User Features:**
+- Station-specific dashboard
+- Program schedule editor
+- Analytics data visualization
+- Branding management interface
+- Payment history view
+
+## 📊 API Endpoints (Planned)
+
+### Public Mobile API (`/api/public/*`)
+Authentication: API key in `Authorization: Bearer {key}` header
+- `GET /api/public/config` - Station configuration
+- `GET /api/public/schedule?date=YYYY-MM-DD` - Program schedule
+- `POST /api/public/analytics` - Log listening session
+
+### Admin API (`/api/admin/*`)
+Authentication: NextAuth.js session (admin role)
+- Station management (CRUD)
+- Payment tracking
+- Email notifications
+- User management
+
+### Station User API (`/api/station/*`)
+Authentication: NextAuth.js session (station role)
+- Program schedule management
+- Analytics viewing
+- Branding updates
+- Payment history
+
+## 🔐 Security Features
+
+- **API Key Authentication** - Secure mobile app access
+- **Session-based Auth** - NextAuth.js for web dashboards
+- **Role-based Access Control** - Admin vs Station user permissions
+- **Password Hashing** - bcrypt for user credentials
+- **Input Validation** - Comprehensive request validation
+- **SQL Injection Prevention** - Drizzle ORM parameterized queries
+- **Rate Limiting** - API abuse prevention (Phase 2+)
+
+## 📈 Development Phases
+
+- **Phase 0** ✅: Project documentation
+- **Phase 1** ✅: Backend foundation (database, schema, seed data)
+- **Phase 2**: Public mobile API endpoints
+- **Phase 3**: Admin dashboard backend
+- **Phase 4**: Admin dashboard frontend (simple Bootstrap UI)
+- **Phase 5**: Station user backend
+- **Phase 6**: Station user frontend (simple Bootstrap UI)
+- **Phase 7**: Mobile app integration
+- **Phase 8-9**: Testing and deployment
+
+## 🛠️ Development Commands
+
+All commands should be run from the `backend/` directory:
+
 ```bash
-cd cloud
-docker-compose up -d
+# Development
+npm run dev              # Start dev server
+npm run build            # Build for production
+npm run start            # Start production server
+
+# Database
+npm run db:push          # Push schema to database
+npm run db:generate      # Generate migrations
+npm run db:studio        # Open Drizzle Studio
+npm run db:seed          # Seed sample data
+
+# Code Quality
+npm run lint             # Run ESLint
 ```
 
-## 🔐 Security Considerations
+## 📚 Documentation
 
-- **API Authentication** - Laravel Sanctum for secure API access
-- **Rate Limiting** - Prevent API abuse
-- **Input Validation** - Comprehensive request validation
-- **File Upload Security** - Secure audio file handling
-- **CORS Configuration** - Proper cross-origin setup
-- **SQL Injection Prevention** - Eloquent ORM protection
-- **XSS Protection** - Input sanitization
-
-## 📊 Performance Optimization
-
-- **Database Indexing** - Optimized queries
-- **Caching Strategy** - Redis for frequently accessed data
-- **CDN Integration** - Fast audio delivery
-- **Image Optimization** - Compressed and optimized images
-- **Lazy Loading** - Efficient resource loading
-- **API Pagination** - Large dataset handling
-
-## 🧪 Testing Strategy
-
-- **Unit Tests** - Laravel feature tests
-- **Integration Tests** - API endpoint testing
-- **Frontend Tests** - React component testing
-- **E2E Tests** - Full user journey testing
-- **Performance Tests** - Load and stress testing
-
-## 📈 Monitoring & Logging
-
-- **Application Monitoring** - Error tracking and performance
-- **Server Monitoring** - Resource usage and health
-- **Audio Streaming Metrics** - Stream quality and uptime
-- **User Analytics** - Dashboard usage patterns
-- **Security Monitoring** - Intrusion detection
+- **[backend/README.md](./backend/README.md)** - Detailed backend setup and API docs
+- **[backend/CLAUDE.md](./backend/CLAUDE.md)** - Backend architecture and database schema
+- **[backend/API_DOCUMENTATION.md](./backend/API_DOCUMENTATION.md)** - API specification guide
 
 ## 🚀 Deployment Options
 
-### Option 1: Traditional VPS
-- Single server deployment
-- Perfect for small to medium radio stations
-- Cost-effective solution
+### Option 1: Vercel (Recommended)
+- Optimized for Next.js
+- Automatic deployments from Git
+- Built-in environment variables
+- PostgreSQL via Vercel Postgres or external provider
 
-### Option 2: Cloud Infrastructure
-- AWS/Google Cloud/Azure deployment
-- Auto-scaling capabilities
-- High availability setup
+### Option 2: Docker
+- Containerized deployment
+- Self-hosted on any VPS
+- Full control over infrastructure
 
-### Option 3: Containerized Deployment
-- Docker + Kubernetes
-- Microservices architecture
-- Enterprise-grade scalability
+### Option 3: Traditional VPS
+- Deploy to DigitalOcean, Linode, AWS EC2, etc.
+- Use PM2 for process management
+- nginx as reverse proxy
 
-## 📅 Development Timeline
+## 📞 Get Started
 
-### Phase 1: Foundation (4-6 weeks)
-- [ ] Laravel API setup and authentication
-- [ ] Basic React.js dashboard
-- [ ] Database schema design
-- [ ] Core API endpoints
-
-### Phase 2: Core Features (6-8 weeks)
-- [ ] Stream management system
-- [ ] Schedule management
-- [ ] User management
-- [ ] Basic analytics
-
-### Phase 3: Advanced Features (4-6 weeks)
-- [ ] Real-time dashboard
-- [ ] Push notification system
-- [ ] Advanced analytics
-- [ ] Mobile app integration
-
-### Phase 4: Polish & Deploy (2-4 weeks)
-- [ ] UI/UX improvements
-- [ ] Performance optimization
-- [ ] Security hardening
-- [ ] Documentation completion
-
-## 🤝 Contributing
-
-Once development begins, we'll welcome contributions in:
-- Backend API development
-- Frontend dashboard features
-- Database optimization
-- Testing and QA
-- Documentation
-
-## 📞 Get Involved
-
-Interested in contributing to the cloud platform development?
-- Check our [main project README](../README.md)
-- Join our development discussions
-- Review the mobile app to understand the integration requirements
+Ready to dive in? Check the [backend README](./backend/README.md) for comprehensive setup instructions.
 
 ---
 
-**Note**: This cloud platform is currently in the planning phase. The mobile app is fully functional and ready for use. Backend and frontend development will begin based on community interest and contributions.
+**Note**: This platform uses **Next.js** (not Laravel) with simple Bootstrap styling (not Tailwind CSS). The architecture emphasizes simplicity and type safety throughout.
+
+**Current Phase:** Phase 1 Complete ✅ | **Next:** Phase 2 - Public Mobile API

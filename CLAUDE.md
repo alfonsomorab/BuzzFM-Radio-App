@@ -40,7 +40,7 @@ This monorepo contains three interconnected platforms:
 - **Next Steps**: Initialize Next.js project, setup database schema
 
 ### 🌐 Web Dashboard (`/backend/` - Frontend Pages)
-- **Technology**: Next.js with shadcn/ui components
+- **Technology**: Next.js with Bootstrap + custom React components
 - **Features**: Two dashboards (admin and station user)
 - **Admin Dashboard**: Station registration, API key management, payment tracking, email management
 - **Station Dashboard**: Schedule editor, analytics viewing, branding management
@@ -107,7 +107,7 @@ This monorepo contains three interconnected platforms:
 | Backend Language | TypeScript | 5.0+ |
 | Database | PostgreSQL | 15+ |
 | ORM | Drizzle | Latest |
-| Web UI Components | shadcn/ui | Latest |
+| Web UI Styling | Bootstrap + Custom CSS | Latest |
 | Mobile State Mgmt | Provider (ChangeNotifier) | - |
 | Audio Streaming | just_audio | 0.9.36 |
 | Background Audio | audio_service | 0.18.12 |
@@ -319,7 +319,7 @@ npm run dev          # Start dev server
 4. **Sessions for Web**: Better UX for dashboard users with persistent login
 5. **Manual Payments First**: Faster MVP, Stripe integration later
 6. **Template-Based Mobile**: Simple, flexible, admin has full control
-7. **shadcn/ui**: Customizable components without bloat
+7. **Bootstrap over Tailwind**: Simple, responsive, no build complexity
 
 ## Troubleshooting
 

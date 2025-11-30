@@ -11,7 +11,7 @@ Next.js 14+ backend with TypeScript providing REST API endpoints and web dashboa
 - **Language**: TypeScript 5.0+
 - **Database**: PostgreSQL 15+
 - **ORM**: Drizzle ORM
-- **Styling**: Tailwind CSS 4.1+
+- **Styling**: Bootstrap + Custom CSS
 - **Authentication**: NextAuth.js (to be implemented in Phase 3)
 - **Email**: Nodemailer + SMTP (to be implemented in Phase 3)
 
@@ -56,7 +56,7 @@ cloud/backend/
 │   │   ├── page.tsx             # Home page
 │   │   └── globals.css          # Global styles
 │   ├── components/
-│   │   ├── ui/                  # shadcn/ui components (to be added)
+│   │   ├── ui/                  # Reusable UI components (to be added)
 │   │   ├── admin/               # Admin-specific components
 │   │   └── station/             # Station-specific components
 │   ├── db/
@@ -71,7 +71,6 @@ cloud/backend/
 ├── drizzle.config.ts            # Drizzle configuration
 ├── next.config.ts               # Next.js configuration
 ├── tsconfig.json                # TypeScript configuration
-├── tailwind.config.ts           # Tailwind configuration
 ├── .env.local                   # Local environment variables (not committed)
 └── .env.example                 # Environment variables template
 ```
@@ -339,7 +338,7 @@ Before deploying to production:
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Drizzle ORM Documentation](https://orm.drizzle.team)
 - [NextAuth.js Documentation](https://next-auth.js.org)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Bootstrap Documentation](https://getbootstrap.com/docs)
 
 ---
 

@@ -21,7 +21,7 @@ This backend serves three types of users:
 - **ORM**: Drizzle ORM
 - **Authentication**: NextAuth.js (Phase 3)
 - **Email**: Nodemailer + SMTP (Phase 3)
-- **Styling**: Tailwind CSS (Phase 4+)
+- **Styling**: Bootstrap + Custom CSS (Phase 4+)
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@ This backend serves three types of users:
 - Email service with reminders
 
 **Phase 4+ - Web Dashboards:**
-- shadcn/ui components
+- Bootstrap + custom React components
 - Admin management interface
 - Station user interface
 - Real-time analytics
@@ -371,7 +371,7 @@ cloud/backend/
 │   │   └── globals.css           # Global styles
 │   │
 │   ├── components/               # React components
-│   │   ├── ui/                  # shadcn/ui components (Phase 4+)
+│   │   ├── ui/                  # Reusable UI components (Phase 4+)
 │   │   ├── admin/               # Admin-specific components
 │   │   └── station/             # Station-specific components
 │   │
@@ -394,7 +394,6 @@ cloud/backend/
 ├── drizzle.config.ts             # Drizzle configuration
 ├── next.config.ts                # Next.js configuration
 ├── tsconfig.json                 # TypeScript configuration
-├── tailwind.config.ts            # Tailwind configuration
 ├── package.json                  # Dependencies and scripts
 ├── .env.example                  # Environment template
 ├── .env.local                    # Local environment (not committed)
