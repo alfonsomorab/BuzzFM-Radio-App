@@ -1,0 +1,1300 @@
+openapi: 3.0.3
+info:
+  title: Radio Streaming Management Platform API
+  description: |
+    REST API for radio streaming platform with three authentication layers:
+    - **Public Mobile API** - API key authentication for mobile apps
+    - **Admin API** - Session authentication for platform administrators
+    - **Station API** - Session authentication for radio station managers
+
+    Built with Next.js 14+, TypeScript, and PostgreSQL.
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@radiostreaming.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.radiostreaming.com
+    description: Production server
+
+tags:
+  - name: Public Mobile API
+    description: Endpoints for mobile apps (API key authentication)
+  - name: Admin - Stations
+    description: Station management endpoints (admin only)
+  - name: Admin - Payments
+    description: Payment tracking endpoints (admin only)
+  - name: Admin - Emails
+    description: Email notification endpoints (admin only)
+  - name: Station - Programs
+    description: Program schedule management (station users)
+  - name: Station - Analytics
+    description: Analytics viewing (station users)
+  - name: Station - Branding
+    description: Branding management (station users)
+
+paths:
+  # ==========================================
+  # PUBLIC MOBILE API ENDPOINTS
+  # ==========================================
+
+  /api/public/config:
+    get:
+      tags:
+        - Public Mobile API
+      summary: Get station configuration
+      description: Returns station details, stream URLs, status, and branding for the mobile app
+      operationId: getStationConfig
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Station configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  station:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: "123e4567-e89b-12d3-a456-426614174000"
+                      name:
+                        type: string
+                        example: "Magic FM 95.7"
+                      status:
+                        type: string
+                        enum: [active, suspended]
+                        example: "active"
+                      description:
+                        type: string
+                        example: "Your favorite music station"
+                      musicGenre:
+                        type: string
+                        example: "Pop, Rock, Dance"
+                      branding:
+                        type: object
+                        properties:
+                          logoUrl:
+                            type: string
+                            format: uri
+                            example: "https://cdn.example.com/logo.png"
+                          primaryColor:
+                            type: string
+                            example: "#FF5733"
+                          secondaryColor:
+                            type: string
+                            example: "#33FF57"
+                  streamUrls:
+                    type: object
+                    properties:
+                      primary:
+                        type: string
+                        format: uri
+                        example: "https://stream.magicfm.com/live"
+                      backup:
+                        type: string
+                        format: uri
+                        example: "https://backup.magicfm.com/live"
+                      qualities:
+                        type: object
+                        properties:
+                          high:
+                            type: string
+                            format: uri
+                            example: "https://stream.magicfm.com/high"
+                          medium:
+                            type: string
+                            format: uri
+                            example: "https://stream.magicfm.com/medium"
+                          low:
+                            type: string
+                            format: uri
+                            example: "https://stream.magicfm.com/low"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/public/schedule:
+    get:
+      tags:
+        - Public Mobile API
+      summary: Get program schedule
+      description: Returns program schedule for a specific date
+      operationId: getProgramSchedule
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: date
+          in: query
+          description: Date in YYYY-MM-DD format
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "2024-12-01"
+      responses:
+        '200':
+          description: Program schedule retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                    example: "2024-12-01"
+                  programs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Program'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/public/analytics:
+    post:
+      tags:
+        - Public Mobile API
+      summary: Log listening session
+      description: Records analytics data from mobile app listening session
+      operationId: logAnalytics
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sessionDuration
+                - quality
+              properties:
+                sessionDuration:
+                  type: integer
+                  description: Session duration in seconds
+                  example: 1800
+                quality:
+                  type: string
+                  enum: [high, medium, low]
+                  example: "high"
+                country:
+                  type: string
+                  description: ISO country code
+                  example: "US"
+                city:
+                  type: string
+                  example: "New York"
+                platform:
+                  type: string
+                  enum: [ios, android]
+                  example: "ios"
+      responses:
+        '201':
+          description: Analytics logged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Analytics logged successfully"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # ADMIN - STATIONS ENDPOINTS
+  # ==========================================
+
+  /api/admin/stations:
+    get:
+      tags:
+        - Admin - Stations
+      summary: List all stations
+      description: Returns paginated list of all radio stations (admin only)
+      operationId: listStations
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Items per page
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, suspended, all]
+            default: all
+          description: Filter by station status
+      responses:
+        '200':
+          description: Stations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RadioStation'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Admin - Stations
+      summary: Create new station
+      description: Registers a new radio station and auto-generates API key
+      operationId: createStation
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStationRequest'
+      responses:
+        '201':
+          description: Station created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  station:
+                    $ref: '#/components/schemas/RadioStation'
+                  apiKey:
+                    type: string
+                    description: Generated API key (only returned once)
+                    example: "sk_live_abc123xyz789..."
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/admin/stations/{id}:
+    get:
+      tags:
+        - Admin - Stations
+      summary: Get station details
+      description: Returns detailed information about a specific station
+      operationId: getStation
+      security:
+        - SessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StationId'
+      responses:
+        '200':
+          description: Station details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadioStation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Admin - Stations
+      summary: Update station
+      description: Updates station information (admin only)
+      operationId: updateStation
+      security:
+        - SessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStationRequest'
+      responses:
+        '200':
+          description: Station updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadioStation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Admin - Stations
+      summary: Delete station
+      description: Permanently deletes a station and all associated data
+      operationId: deleteStation
+      security:
+        - SessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StationId'
+      responses:
+        '204':
+          description: Station deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/admin/stations/{id}/suspend:
+    post:
+      tags:
+        - Admin - Stations
+      summary: Suspend station
+      description: Suspends a radio station, preventing mobile app access
+      operationId: suspendStation
+      security:
+        - SessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: Reason for suspension
+                  example: "Payment overdue"
+      responses:
+        '200':
+          description: Station suspended successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadioStation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/admin/stations/{id}/activate:
+    post:
+      tags:
+        - Admin - Stations
+      summary: Activate station
+      description: Activates a suspended station
+      operationId: activateStation
+      security:
+        - SessionAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StationId'
+      responses:
+        '200':
+          description: Station activated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadioStation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # ADMIN - PAYMENTS ENDPOINTS
+  # ==========================================
+
+  /api/admin/payments:
+    get:
+      tags:
+        - Admin - Payments
+      summary: List all payments
+      description: Returns paginated list of all payment records
+      operationId: listPayments
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, paid, overdue, all]
+            default: all
+        - name: stationId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by station ID
+      responses:
+        '200':
+          description: Payments retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Admin - Payments
+      summary: Record payment
+      description: Creates a new payment record for a station
+      operationId: createPayment
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment recorded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # ADMIN - EMAILS ENDPOINTS
+  # ==========================================
+
+  /api/admin/emails/reminder:
+    post:
+      tags:
+        - Admin - Emails
+      summary: Send subscription reminder
+      description: Sends subscription reminder email to station contact
+      operationId: sendSubscriptionReminder
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stationId
+                - reminderType
+              properties:
+                stationId:
+                  type: string
+                  format: uuid
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+                reminderType:
+                  type: string
+                  enum: [7_days, 1_day, overdue]
+                  example: "7_days"
+      responses:
+        '200':
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Reminder email sent successfully"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # STATION - PROGRAMS ENDPOINTS
+  # ==========================================
+
+  /api/station/programs:
+    get:
+      tags:
+        - Station - Programs
+      summary: Get station programs
+      description: Returns all programs for the authenticated station user
+      operationId: getStationPrograms
+      security:
+        - SessionAuth: []
+      responses:
+        '200':
+          description: Programs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  programs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Program'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Station - Programs
+      summary: Create program
+      description: Creates a new program schedule for the station
+      operationId: createProgram
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProgramRequest'
+      responses:
+        '201':
+          description: Program created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/station/programs/{id}:
+    put:
+      tags:
+        - Station - Programs
+      summary: Update program
+      description: Updates an existing program schedule
+      operationId: updateProgram
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProgramRequest'
+      responses:
+        '200':
+          description: Program updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Station - Programs
+      summary: Delete program
+      description: Deletes a program schedule
+      operationId: deleteProgram
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Program deleted successfully
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # STATION - ANALYTICS ENDPOINTS
+  # ==========================================
+
+  /api/station/analytics:
+    get:
+      tags:
+        - Station - Analytics
+      summary: View station analytics
+      description: Returns analytics data for the authenticated station
+      operationId: getStationAnalytics
+      security:
+        - SessionAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date for analytics range
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date for analytics range
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  daily:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DailyAnalytics'
+                  geography:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GeographyAnalytics'
+                  summary:
+                    type: object
+                    properties:
+                      totalListeners:
+                        type: integer
+                        example: 15000
+                      averageListeners:
+                        type: integer
+                        example: 500
+                      peakListeners:
+                        type: integer
+                        example: 1200
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ==========================================
+  # STATION - BRANDING ENDPOINTS
+  # ==========================================
+
+  /api/station/branding:
+    put:
+      tags:
+        - Station - Branding
+      summary: Update station branding
+      description: Updates station branding (logo, colors)
+      operationId: updateBranding
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                logoUrl:
+                  type: string
+                  format: uri
+                  example: "https://cdn.example.com/new-logo.png"
+                primaryColor:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+                  example: "#FF5733"
+                secondaryColor:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+                  example: "#33FF57"
+      responses:
+        '200':
+          description: Branding updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RadioStation'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+# ==========================================
+# COMPONENTS
+# ==========================================
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
+      description: API key for mobile app authentication (format: Bearer sk_live_...)
+
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+      description: Session cookie from NextAuth.js
+
+  parameters:
+    StationId:
+      name: id
+      in: path
+      required: true
+      description: Station UUID
+      schema:
+        type: string
+        format: uuid
+        example: "123e4567-e89b-12d3-a456-426614174000"
+
+  schemas:
+    RadioStation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "Magic FM 95.7"
+        slug:
+          type: string
+          example: "magic-fm"
+        address:
+          type: string
+          example: "123 Radio Street, Music City"
+        description:
+          type: string
+          example: "Your favorite music station"
+        musicGenre:
+          type: string
+          example: "Pop, Rock, Dance"
+        contactName:
+          type: string
+          example: "John Doe"
+        contactPhone:
+          type: string
+          example: "+1-555-0123"
+        contactEmail:
+          type: string
+          format: email
+          example: "contact@magicfm.com"
+        streamUrlPrimary:
+          type: string
+          format: uri
+          example: "https://stream.magicfm.com/live"
+        streamUrlBackup:
+          type: string
+          format: uri
+          example: "https://backup.magicfm.com/live"
+        status:
+          type: string
+          enum: [active, suspended]
+          example: "active"
+        subscriptionDueDate:
+          type: string
+          format: date
+          example: "2024-12-31"
+        lastPaymentDate:
+          type: string
+          format: date
+          example: "2024-11-01"
+        branding:
+          type: object
+          properties:
+            logoUrl:
+              type: string
+              format: uri
+            primaryColor:
+              type: string
+            secondaryColor:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Program:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stationId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: "Morning Show"
+        hostName:
+          type: string
+          example: "Sarah Johnson"
+        description:
+          type: string
+          example: "Wake up with the best music and entertainment"
+        dayOfWeek:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: "0 = Sunday, 6 = Saturday"
+          example: 1
+        startTime:
+          type: string
+          format: time
+          example: "06:00:00"
+        endTime:
+          type: string
+          format: time
+          example: "10:00:00"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stationId:
+          type: string
+          format: uuid
+        amount:
+          type: integer
+          description: Amount in cents
+          example: 5000
+        paymentDate:
+          type: string
+          format: date
+          example: "2024-11-01"
+        dueDate:
+          type: string
+          format: date
+          example: "2024-12-01"
+        status:
+          type: string
+          enum: [pending, paid, overdue]
+          example: "paid"
+        notes:
+          type: string
+          example: "Monthly subscription payment"
+        recordedBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+
+    DailyAnalytics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stationId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        totalListeners:
+          type: integer
+          example: 500
+        peakListeners:
+          type: integer
+          example: 120
+        peakTime:
+          type: string
+          format: time
+          example: "08:30:00"
+        createdAt:
+          type: string
+          format: date-time
+
+    GeographyAnalytics:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        stationId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        country:
+          type: string
+          example: "US"
+        city:
+          type: string
+          example: "New York"
+        listenerCount:
+          type: integer
+          example: 150
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateStationRequest:
+      type: object
+      required:
+        - name
+        - contactEmail
+        - streamUrlPrimary
+      properties:
+        name:
+          type: string
+          example: "Magic FM 95.7"
+        address:
+          type: string
+        description:
+          type: string
+        musicGenre:
+          type: string
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+        streamUrlPrimary:
+          type: string
+          format: uri
+        streamUrlBackup:
+          type: string
+          format: uri
+        subscriptionDueDate:
+          type: string
+          format: date
+        branding:
+          type: object
+          properties:
+            logoUrl:
+              type: string
+              format: uri
+            primaryColor:
+              type: string
+            secondaryColor:
+              type: string
+
+    UpdateStationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        description:
+          type: string
+        musicGenre:
+          type: string
+        contactName:
+          type: string
+        contactPhone:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+        streamUrlPrimary:
+          type: string
+          format: uri
+        streamUrlBackup:
+          type: string
+          format: uri
+        subscriptionDueDate:
+          type: string
+          format: date
+
+    CreateProgramRequest:
+      type: object
+      required:
+        - title
+        - dayOfWeek
+        - startTime
+        - endTime
+      properties:
+        title:
+          type: string
+        hostName:
+          type: string
+        description:
+          type: string
+        dayOfWeek:
+          type: integer
+          minimum: 0
+          maximum: 6
+        startTime:
+          type: string
+          format: time
+        endTime:
+          type: string
+          format: time
+        isActive:
+          type: boolean
+          default: true
+
+    UpdateProgramRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        hostName:
+          type: string
+        description:
+          type: string
+        dayOfWeek:
+          type: integer
+          minimum: 0
+          maximum: 6
+        startTime:
+          type: string
+          format: time
+        endTime:
+          type: string
+          format: time
+        isActive:
+          type: boolean
+
+    CreatePaymentRequest:
+      type: object
+      required:
+        - stationId
+        - amount
+        - dueDate
+      properties:
+        stationId:
+          type: string
+          format: uuid
+        amount:
+          type: integer
+          description: Amount in cents
+        paymentDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [pending, paid, overdue]
+          default: pending
+        notes:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 20
+        total:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 5
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Error message"
+        message:
+          type: string
+          example: "Detailed error description"
+        statusCode:
+          type: integer
+          example: 400
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required or invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Unauthorized"
+            message: "Invalid or missing authentication credentials"
+            statusCode: 401
+
+    ForbiddenError:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Forbidden"
+            message: "You do not have permission to access this resource"
+            statusCode: 403
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Not Found"
+            message: "The requested resource was not found"
+            statusCode: 404
+
+    BadRequestError:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Bad Request"
+            message: "Invalid request parameters or body"
+            statusCode: 400
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Internal Server Error"
+            message: "An unexpected error occurred"
+            statusCode: 500

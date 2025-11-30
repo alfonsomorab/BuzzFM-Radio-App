@@ -1,238 +1,381 @@
-# 📻 Radio App - Complete Radio Streaming Platform
+# 📻 Radio Streaming Management Platform
 
-A comprehensive radio streaming platform consisting of a **Flutter mobile app** and a **Laravel + React.js web platform**. This project provides everything needed to build, customize, and deploy your own radio streaming service.
+A comprehensive multi-platform radio streaming management system that enables radio streamers to manage multiple radio station clients with custom-branded mobile apps and centralized web dashboards.
 
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
-![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Drizzle](https://img.shields.io/badge/Drizzle-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)
 
 ## 🎯 Project Overview
 
-This radio streaming platform enables radio stations, podcasters, and content creators to build their own branded streaming apps and web platforms. The project is designed to be easily customizable and deployable for different radio stations or streaming services.
+This platform is designed for **radio streamers (admins)** who manage multiple radio station clients. Each client gets their own customized mobile app and access to a web dashboard, while the admin has full control over all stations, subscriptions, and deployments.
 
-### ✨ Key Features
+### 🏗️ Business Model
 
-- **📱 Native Mobile Apps** (iOS & Android) with Flutter
-- **🌐 Web Management Dashboard** with React.js
-- **🎵 Multi-Quality Audio Streaming** (High/Medium/Low)
-- **📋 Program Schedule Management**
-- **🔔 Push Notifications** for program alerts
-- **⚙️ Environment-Based Configuration**
-- **🎨 Easy Branding & Customization**
-- **📊 Analytics Dashboard** (planned)
-- **👥 User Management** (planned)
+1. **Admin** registers radio stations in the web platform → API keys auto-generated
+2. **Admin** clones Flutter mobile template → configures branding and API key
+3. **Admin** builds and distributes customized mobile apps for each station
+4. **Admin** tracks subscription payments and sends automated email reminders
+5. **Radio stations** manage their own schedules, analytics, and branding via web dashboard
+6. **Mobile app users** stream live radio from their favorite stations
 
 ## 📁 Project Structure
 
 ```
 radio-app/
-├── mobile/                 # Flutter mobile application
+├── mobile/                     # Flutter mobile application (iOS & Android)
 │   ├── lib/
-│   │   ├── core/          # Core services and configuration
-│   │   ├── data/          # Data layer (repositories, datasources)
-│   │   ├── domain/        # Business logic and entities
-│   │   └── presentation/  # UI layer (screens, widgets, viewmodels)
-│   ├── .env.example       # Environment configuration template
-│   └── ENVIRONMENT_SETUP.md
+│   │   ├── core/              # Services, dependency injection, config
+│   │   ├── data/              # Models, repositories, data sources
+│   │   ├── domain/            # Entities, repository interfaces, use cases
+│   │   └── presentation/      # Views, view models, widgets
+│   ├── .env.example           # Environment configuration template
+│   ├── pubspec.yaml           # Flutter dependencies
+│   └── README.md              # Mobile-specific documentation
 │
-├── cloud/                 # Laravel + React.js web platform
-│   ├── backend/           # Laravel API backend (planned)
-│   ├── frontend/          # React.js admin dashboard (planned)
-│   └── infrastructure/    # Docker & deployment configs (planned)
+├── cloud/backend/             # Next.js backend + web dashboards
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── api/          # API routes (public, admin, station)
+│   │   │   ├── admin/        # Admin dashboard pages (Phase 4)
+│   │   │   └── station/      # Station user pages (Phase 6)
+│   │   ├── components/       # React components (Phase 4+)
+│   │   ├── db/               # Drizzle schema, migrations, seed
+│   │   └── lib/              # Utilities, auth, email
+│   ├── drizzle.config.ts
+│   ├── package.json
+│   └── README.md              # Backend-specific documentation
 │
-└── README.md             # This file
+├── CLAUDE.md                  # Project architecture documentation
+└── README.md                  # This file
 ```
 
-## 📱 Mobile App (Flutter)
+## 🚀 Technology Stack
 
-### Architecture
-- **MVVM Pattern** with Repository pattern
-- **Clean Architecture** with clear separation of concerns
-- **Provider** for state management
-- **Dependency Injection** for service management
+### Mobile App
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Flutter | 3.8+ | Cross-platform framework |
+| Dart | 3.0+ | Programming language |
+| just_audio | 0.9.36 | Audio streaming |
+| audio_service | 0.18.12 | Background playback |
+| Provider | Latest | State management |
 
-### Core Features
-- ✅ **Live Radio Streaming** with multiple quality options
-- ✅ **Program Schedule** with real-time updates
-- ✅ **Settings Management** with audio quality controls
-- ✅ **Background Audio Playback**
-- ✅ **Modern Material Design UI**
-- ✅ **Environment-based Configuration**
+### Backend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Next.js | 14+ | Full-stack framework |
+| TypeScript | 5.0+ | Type-safe development |
+| PostgreSQL | 15+ | Database |
+| Drizzle ORM | Latest | Type-safe ORM |
+| NextAuth.js | Latest | Authentication (Phase 3) |
+| Nodemailer | Latest | Email service (Phase 3) |
 
-### Technology Stack
-- **Flutter 3.8+** - Cross-platform mobile framework
-- **just_audio** - Audio streaming and playback
-- **provider** - State management
-- **shared_preferences** - Local data storage
-- **cached_network_image** - Image loading and caching
-- **flutter_dotenv** - Environment configuration
-
-### Quick Start
-```bash
-cd mobile
-cp .env.example .env
-# Edit .env with your configuration
-flutter pub get
-flutter run
-```
-
-### Customization
-The mobile app is fully configurable through environment variables:
-- **App branding** (name, package names)
-- **Streaming endpoints** (multiple quality levels)
-- **Feature toggles** (notifications, background play)
-- **API configuration** for backend integration
-
-[📖 Read the complete Mobile Setup Guide](./mobile/ENVIRONMENT_SETUP.md)
-
-## ☁️ Cloud Platform (Laravel + React.js) - *Coming Soon*
-
-### Planned Backend (Laravel)
-- **🎵 Stream Management** - Upload and manage audio content
-- **📅 Schedule Management** - Create and manage program schedules
-- **👥 User Management** - Admin and broadcaster accounts
-- **📊 Analytics** - Listen statistics and engagement metrics
-- **🔔 Notification System** - Push notifications to mobile apps
-- **🎨 Content Management** - Program descriptions, images, hosts
-- **🔐 Authentication & Authorization** - Role-based access control
-
-### Planned Frontend (React.js)
-- **📊 Dashboard** - Real-time analytics and monitoring
-- **📅 Schedule Editor** - Drag-and-drop program scheduling
-- **🎵 Content Library** - Audio file management
-- **⚙️ Settings Panel** - Stream configuration and app settings
-- **📱 Mobile App Management** - Push notification controls
-- **👥 User Management** - Admin interface for users and roles
-
-### Planned Technology Stack
-- **Laravel 10+** - PHP backend framework
-- **React.js 18+** - Frontend library
-- **MySQL/PostgreSQL** - Database
-- **Redis** - Caching and sessions
-- **Docker** - Containerization
-- **AWS S3** - Audio file storage
-- **WebSockets** - Real-time updates
-
-### Planned Architecture
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Mobile App    │◄──►│   Laravel API   │◄──►│  React.js Web   │
-│   (Flutter)     │    │   (Backend)     │    │  (Dashboard)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       ▼                       │
-         │              ┌─────────────────┐              │
-         └─────────────►│   Database      │◄─────────────┘
-                        │ (MySQL/Postgres)│
-                        └─────────────────┘
-```
-
-## 🚀 Getting Started
+## ⚙️ Getting Started
 
 ### Prerequisites
-- **Flutter SDK 3.8+** (for mobile app)
-- **Dart 3.0+**
-- **Android Studio** or **Xcode** (for mobile development)
-- **PHP 8.1+** and **Composer** (for future Laravel backend)
-- **Node.js 18+** and **npm/yarn** (for future React frontend)
-- **Docker** (recommended for cloud deployment)
+
+**For Mobile Development:**
+- Flutter SDK 3.8+
+- Dart SDK 3.0+
+- Android Studio or Xcode
+- Android/iOS device or emulator
+
+**For Backend Development:**
+- Node.js 18+
+- PostgreSQL 15+
+- npm or yarn
+- Git
 
 ### Quick Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/radio-app.git
-   cd radio-app
-   ```
+#### 1. Mobile App
 
-2. **Set up the mobile app**
-   ```bash
-   cd mobile
-   cp .env.example .env
-   # Edit .env with your streaming URLs and app configuration
-   flutter pub get
-   flutter run
-   ```
+```bash
+# Navigate to mobile directory
+cd mobile
 
-3. **Cloud platform setup** (coming soon)
-   ```bash
-   cd cloud
-   # Setup instructions will be added when backend is implemented
-   ```
+# Install dependencies
+flutter pub get
 
-## 🎨 Customization Guide
+# Create environment file
+cp .env.example .env
 
-### For Radio Stations
-1. **Update Environment Variables**
-   - Change app name and branding
-   - Configure your streaming endpoints
-   - Set up API endpoints (when backend is ready)
+# Edit .env with your configuration
+# (Update API_KEY, stream URLs, branding)
 
-2. **Customize UI/UX**
-   - Update color schemes and themes
-   - Replace logos and images
-   - Modify program schedule layouts
+# Run the app
+flutter run
 
-3. **Configure Streaming**
-   - Set up multiple quality streams
-   - Configure default playback settings
-   - Set up background playback options
+# Or build for release
+flutter build apk --release  # Android
+flutter build ios --release  # iOS
+```
 
-### For Developers
-- **Mobile**: Follow MVVM architecture patterns
-- **Backend**: Clean API design with Laravel best practices
-- **Frontend**: Component-based React.js architecture
-- **Deployment**: Docker containers for easy scaling
+**Mobile App Status:** ✅ Fully functional with mock data
 
-## 📊 Roadmap
+For detailed mobile setup instructions, see [mobile/README.md](./mobile/README.md)
 
-### Phase 1: Mobile App ✅
-- [x] Core streaming functionality
-- [x] Program schedule display
-- [x] Settings and quality control
-- [x] Environment configuration
-- [x] Clean architecture implementation
+#### 2. Backend (Next.js)
 
-### Phase 2: Backend API (In Progress)
-- [ ] Laravel API setup
-- [ ] Authentication system
-- [ ] Stream management endpoints
-- [ ] Schedule management
-- [ ] Push notification service
+```bash
+# Navigate to backend directory
+cd cloud/backend
 
-### Phase 3: Web Dashboard
-- [ ] React.js admin dashboard
-- [ ] Real-time analytics
-- [ ] Content management interface
-- [ ] User management system
+# Install dependencies
+npm install
 
-### Phase 4: Advanced Features
-- [ ] Live chat integration
-- [ ] Social media integration
-- [ ] Advanced analytics
-- [ ] Multi-language support
-- [ ] White-label solutions
+# Create environment file
+cp .env.example .env.local
+
+# Edit .env.local with your PostgreSQL credentials
+# DATABASE_URL=postgresql://username:password@localhost:5432/radio_streaming
+
+# Create PostgreSQL database
+createdb radio_streaming
+
+# Push database schema
+npm run db:push
+
+# Seed sample data
+npm run db:seed
+
+# Run development server
+npm run dev
+```
+
+**Backend Status:**
+- ✅ Phase 1 Complete: Database schema, seed data
+- ⏳ Phase 2 In Progress: Public mobile API endpoints
+
+For detailed backend setup instructions, see [cloud/backend/README.md](./cloud/backend/README.md)
+
+## 👥 User Roles & Capabilities
+
+### Admin (Radio Streamer)
+**Access:** Full platform control via admin dashboard
+
+**Can:**
+- Register and manage radio stations
+- Generate and view API keys for each station
+- Update station information, stream URLs, and branding
+- Suspend/activate stations
+- Track subscription payments manually
+- Send automated subscription reminder emails (7 days, 1 day before due)
+- View all stations and their status
+- Monitor analytics across all stations
+
+### Radio Station User
+**Access:** Station-specific dashboard
+
+**Can:**
+- Manage their station's program schedules
+- View listener analytics (daily totals, geography, peak times)
+- Update station branding (logo, colors, description)
+- View payment history and subscription status
+
+### Mobile App User (End Users)
+**Access:** Station-specific mobile app
+
+**Can:**
+- Stream live radio with play/pause/stop controls
+- Play audio in background
+- View today's program schedule
+- Select streaming quality (high/medium/low)
+- Receive media notifications with playback controls
+
+## 🗄️ Database Schema
+
+### Core Tables
+
+**users** - Admin and station user accounts
+- Fields: id, email, password_hash, name, role, station_id, timestamps
+- Roles: admin, station
+
+**radio_stations** - Radio station details and configuration
+- Fields: id, name, slug, contact info, stream URLs, api_key, status, subscription dates, branding (JSON)
+- Status: active, suspended
+
+**programs** - Program schedules per station
+- Fields: id, station_id, title, host_name, day_of_week, start_time, end_time, is_active
+
+**payments** - Payment tracking records
+- Fields: id, station_id, amount, payment_date, due_date, status, notes
+
+**analytics_daily** - Daily listener metrics per station
+- Fields: id, station_id, date, total_listeners, peak_listeners, peak_time
+
+**analytics_geography** - Geographic listener distribution
+- Fields: id, station_id, date, country, city, listener_count
+
+## 🔌 API Endpoints (Planned)
+
+### Public Mobile API (`/api/public/*`)
+Authentication: API key in header
+
+- `GET /api/public/config` - Station configuration and stream URLs
+- `GET /api/public/schedule?date=YYYY-MM-DD` - Program schedule
+- `POST /api/public/analytics` - Log listening session
+
+### Admin API (`/api/admin/*`)
+Authentication: NextAuth.js session (admin role)
+
+- `GET /api/admin/stations` - List all stations
+- `POST /api/admin/stations` - Create new station
+- `PUT /api/admin/stations/[id]` - Update station
+- `POST /api/admin/stations/[id]/suspend` - Suspend station
+- `GET /api/admin/payments` - Payment management
+- `POST /api/admin/emails/reminder` - Send reminders
+
+### Station User API (`/api/station/*`)
+Authentication: NextAuth.js session (station role)
+
+- `GET /api/station/programs` - Get programs
+- `POST /api/station/programs` - Create program
+- `PUT /api/station/programs/[id]` - Update program
+- `DELETE /api/station/programs/[id]` - Delete program
+- `GET /api/station/analytics` - View analytics
+- `PUT /api/station/branding` - Update branding
+
+## 📋 Development Roadmap
+
+### Phase 0: Documentation ✅ Complete
+- [x] Project architecture documentation
+- [x] CLAUDE.md files for each component
+- [x] README files
+
+### Phase 1: Backend Foundation ✅ Complete
+- [x] Next.js 14+ with TypeScript
+- [x] PostgreSQL database setup
+- [x] Drizzle ORM schema
+- [x] Database migrations and seeding
+
+### Phase 2: Public Mobile API ⏳ In Progress
+- [ ] API key validation middleware
+- [ ] `/api/public/config` endpoint
+- [ ] `/api/public/schedule` endpoint
+- [ ] `/api/public/analytics` endpoint
+- [ ] Rate limiting
+- [ ] Error handling
+
+### Phase 3: Admin Dashboard Backend
+- [ ] NextAuth.js authentication setup
+- [ ] Admin API endpoints (stations CRUD)
+- [ ] Payment tracking endpoints
+- [ ] Email service with Nodemailer
+- [ ] Subscription reminder automation
+
+### Phase 4: Admin Dashboard Frontend
+- [ ] shadcn/ui components setup
+- [ ] Station management interface
+- [ ] API key management UI
+- [ ] Payment tracking UI
+- [ ] Email reminder controls
+
+### Phase 5: Station User Backend
+- [ ] Station API endpoints (programs CRUD)
+- [ ] Analytics endpoints
+- [ ] Branding update endpoints
+
+### Phase 6: Station User Frontend
+- [ ] Station dashboard UI
+- [ ] Program schedule editor
+- [ ] Analytics data visualization
+- [ ] Branding management interface
+
+### Phase 7: Mobile App Integration
+- [ ] Replace mock data with real API
+- [ ] API service layer in Flutter
+- [ ] Error handling and offline support
+- [ ] Suspension flow implementation
+
+### Phase 8: Testing & Polish
+- [ ] End-to-end testing
+- [ ] Performance optimization
+- [ ] Security audit
+- [ ] Documentation completion
+
+### Phase 9: Deployment
+- [ ] Production database setup
+- [ ] Next.js deployment (Vercel/custom)
+- [ ] Mobile app store submission
+- [ ] Monitoring and logging setup
+
+## 🔒 Security Features
+
+- **API Key Authentication**: Secure mobile app access
+- **Session-based Auth**: NextAuth.js for web dashboards
+- **Role-based Access Control**: Admin vs Station user permissions
+- **Password Hashing**: bcrypt for user credentials
+- **Input Validation**: Comprehensive request validation
+- **SQL Injection Prevention**: Drizzle ORM parameterized queries
+- **Rate Limiting**: API abuse prevention
+- **HTTPS**: Secure connections in production
+
+## 🧪 Testing
+
+### Mobile App
+```bash
+cd mobile
+flutter test              # Run unit tests
+flutter analyze           # Static code analysis
+flutter build apk --debug # Test build
+```
+
+### Backend
+```bash
+cd cloud/backend
+npm run lint              # Run ESLint
+npm run build             # Test build
+npm run db:studio         # Open Drizzle Studio
+```
+
+## 📖 Documentation
+
+- **[CLAUDE.md](./CLAUDE.md)** - Overall project architecture
+- **[mobile/README.md](./mobile/README.md)** - Mobile app setup and development
+- **[mobile/CLAUDE.md](./mobile/CLAUDE.md)** - Mobile architecture and API integration
+- **[cloud/backend/README.md](./cloud/backend/README.md)** - Backend setup and API docs
+- **[cloud/backend/CLAUDE.md](./cloud/backend/CLAUDE.md)** - Backend architecture and database
 
 ## 🤝 Contributing
 
-We welcome contributions! Please read our contributing guidelines and feel free to submit pull requests.
+We welcome contributions! Here's how to get started:
 
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests (when applicable)
-5. Submit a pull request
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/your-feature`
+3. **Make your changes**
+4. **Test thoroughly**
+5. **Submit a pull request**
 
 ### Areas We Need Help With
-- 🎨 UI/UX improvements
-- 🔧 Backend API development
-- 📱 Mobile app features
+- 📱 Mobile app features and improvements
 - 🌐 Web dashboard development
+- 🔧 Backend API development
+- 🎨 UI/UX enhancements
 - 📖 Documentation improvements
 - 🧪 Testing and QA
+
+## 🐛 Troubleshooting
+
+### Mobile App Issues
+- **Build fails**: Run `flutter clean && flutter pub get`
+- **Stream not playing**: Check stream URLs in `.env` file
+- **Hot reload not working**: Restart the app completely
+
+### Backend Issues
+- **Database connection fails**: Verify PostgreSQL is running and `DATABASE_URL` is correct
+- **Schema push fails**: Check for syntax errors in `src/db/schema.ts`
+- **Seed fails**: Ensure database is empty or drop/recreate it
+- **Port already in use**: Change port in `package.json` dev script
+
+## 📞 Support
+
+- **Documentation**: Check README files in each directory
+- **Issues**: [Create an issue on GitHub](https://github.com/yourusername/radio-app/issues)
+- **Email**: support@radiostreaming.com
 
 ## 📄 License
 
@@ -240,20 +383,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Flutter Team** - For the amazing cross-platform framework
-- **Laravel Community** - For the robust backend framework
-- **React.js Team** - For the powerful frontend library
-- **Open Source Contributors** - For the packages and tools that make this possible
-
-## 📞 Support
-
-- **Documentation**: Check the README files in each directory
-- **Issues**: Create an issue on GitHub
-- **Discussions**: Use GitHub Discussions for questions
-- **Email**: [your-email@example.com]
+- **Flutter Team** - Cross-platform mobile framework
+- **Vercel Team** - Next.js framework
+- **Drizzle Team** - Type-safe ORM
+- **Open Source Community** - Amazing tools and libraries
 
 ---
 
 **Built with ❤️ for the radio streaming community**
 
-*Transform your radio station into a modern streaming platform with native mobile apps and powerful web management tools.*
+*Transform your radio station management with modern mobile apps and powerful web dashboards.*
