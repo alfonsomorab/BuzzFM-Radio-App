@@ -21,10 +21,11 @@ Badge.displayName = "Badge";
 
 interface StatusBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   status: "active" | "suspended" | "paid" | "pending" | "overdue";
+  customLabel?: string;
 }
 
 export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
-  ({ className, status, children, ...props }, ref) => {
+  ({ className, status, customLabel, children, ...props }, ref) => {
     const badgeClasses = {
       active: "badge-active",
       suspended: "badge-suspended",
@@ -47,7 +48,7 @@ export const StatusBadge = forwardRef<HTMLSpanElement, StatusBadgeProps>(
         className={cn("badge", badgeClasses[status], className)}
         {...props}
       >
-        {children || labels[status]}
+        {children || customLabel || labels[status]}
       </span>
     );
   }
