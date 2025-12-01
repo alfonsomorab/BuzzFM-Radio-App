@@ -6,6 +6,7 @@ import { eq, desc } from "drizzle-orm";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
+import { CopyButton } from "@/components/admin/CopyButton";
 import { formatDate, maskApiKey } from "@/lib/utils";
 
 interface StationDetailPageProps {
@@ -119,12 +120,7 @@ export default async function StationDetailPage({ params }: StationDetailPagePro
                 <dt className="col-sm-4">API Key:</dt>
                 <dd className="col-sm-8">
                   <code className="small">{maskApiKey(station.apiKey)}</code>
-                  <button
-                    className="btn btn-sm btn-outline-secondary ms-2"
-                    onClick={() => navigator.clipboard.writeText(station.apiKey)}
-                  >
-                    <i className="bi bi-clipboard"></i>
-                  </button>
+                  <CopyButton text={station.apiKey} label="API Key copied to clipboard!" />
                 </dd>
 
                 <dt className="col-sm-4">Primary Stream:</dt>
