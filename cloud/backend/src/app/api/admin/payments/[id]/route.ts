@@ -11,13 +11,13 @@ import { eq } from 'drizzle-orm';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin session
     await validateAdminSession();
 
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch payment with station details
     const [payment] = await db

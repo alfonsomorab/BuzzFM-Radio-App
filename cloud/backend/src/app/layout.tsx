@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/Toast";
+import BootstrapClient from "@/components/BootstrapClient";
 
 export const metadata: Metadata = {
   title: "Radio Streaming Platform",
@@ -14,7 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+        <BootstrapClient />
       </body>
     </html>
   );

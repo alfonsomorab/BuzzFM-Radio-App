@@ -12,13 +12,13 @@ import { z } from 'zod';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin session
     await validateAdminSession();
 
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch station
     const [station] = await db
@@ -88,13 +88,13 @@ const updateStationSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin session
     await validateAdminSession();
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if station exists
     const [existingStation] = await db
@@ -112,7 +112,7 @@ export async function PUT(
     // Validate request body
     const validationResult = updateStationSchema.safeParse(body);
     if (!validationResult.success) {
-      return ApiErrors.validationError(validationResult.error.errors);
+      return ApiErrors.validationError(validationResult.error.flatten().fieldErrors);
     }
 
     const data = validationResult.data;
@@ -159,13 +159,13 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin session
     await validateAdminSession();
 
-    const { id } = params;
+    const { id } = await params;
 
     // Check if station exists
     const [station] = await db

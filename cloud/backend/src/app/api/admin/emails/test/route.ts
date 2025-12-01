@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validationResult = sendTestSchema.safeParse(body);
     if (!validationResult.success) {
-      return ApiErrors.validationError(validationResult.error.errors);
+      return ApiErrors.validationError(validationResult.error.flatten().fieldErrors);
     }
 
     const { to, template } = validationResult.data;

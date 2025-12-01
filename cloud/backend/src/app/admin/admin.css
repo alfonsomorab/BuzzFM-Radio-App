@@ -1,0 +1,38 @@
+/* Admin Dashboard Specific Styles */
+
+.admin-stat-card {
+  border-left: 4px solid var(--bs-primary);
+}
+
+.admin-stat-card.success {
+  border-left-color: var(--bs-success);
+}
+
+.admin-stat-card.warning {
+  border-left-color: var(--bs-warning);
+}
+
+.admin-stat-card.danger {
+  border-left-color: var(--bs-danger);
+}
+
+.admin-stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.admin-stat-label {
+  color: #6c757d;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.quick-action-card {
+  transition: transform 0.2s;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+}

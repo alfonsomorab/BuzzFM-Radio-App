@@ -7,6 +7,7 @@ export interface ApiResponse<T = any> {
   error?: {
     message: string;
     code?: string;
+    details?: any;
   };
 }
 
@@ -25,7 +26,8 @@ export function successResponse<T>(data: T, status: number = 200): NextResponse<
 export function errorResponse(
   message: string,
   status: number = 400,
-  code?: string
+  code?: string,
+  details?: any
 ): NextResponse<ApiResponse> {
   return NextResponse.json(
     {
@@ -33,6 +35,7 @@ export function errorResponse(
       error: {
         message,
         code,
+        details,
       },
     },
     { status }
